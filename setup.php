@@ -73,7 +73,9 @@ function footer_config_settings()    {
 function footer_page_bottom()	{
 
     if (read_config_option ('footer_enable') == 'on' )	{
-	print '<div>' . read_config_option ('footer_content',TRUE) . '</div>';
+        cacti_log("Footer plugin displayed " . microtime()  ,true,"footer");
+	//print '<div>' . read_config_option ('footer_content',TRUE) . '</div>';
+	print  read_config_option ('footer_content',TRUE) ;
     }
 }
 
