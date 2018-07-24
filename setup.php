@@ -13,13 +13,17 @@ function plugin_footer_install ()	{
 //    api_plugin_register_hook('footer', 'config_form','footer_config_form', 'setup.php');
     api_plugin_register_hook('footer', 'config_settings', 'footer_config_settings', 'setup.php');
     api_plugin_register_hook('footer', 'page_bottom', 'footer_page_bottom', 'setup.php');
+    api_plugin_register_hook('footer', 'login_after', 'footer_login_after', 'setup.php');
+    api_plugin_register_hook('footer', 'global_settings_update', 'footer_global_settings_update', 'setup.php');
+
+
+
 
 }
 
 function plugin_footer_uninstall ()	{
     // !!! smazat uploaded?
-    db_execute ("delete from settings where name = 'footer_enable' limit 1");
-    db_execute ("delete from settings where name = 'footer_content' limit 1");
+    db_execute ("delete from settings where name like 'plugin_footer%'");
 
 }
 
@@ -43,23 +47,35 @@ function footer_config_settings()    {
 
 
     $temp = array(    
-        'footer_display_header' => array(
+        'plugin_footer_display_header' => array(
                 'friendly_name' => 'Footer',
                 'method' => 'spacer',
         ),
-        'footer_enable' => array(
+        'plugin_footer_enable' => array(
                 'friendly_name' => 'Display footer?',
                 'description' => 'If checked footer will be displayed',
                 'method' => 'checkbox',
                 'default' => 'on',
         ),
-        'footer_content' => array(
+        'plugin_footer_login_enable' => array(
+                'friendly_name' => 'Display footer on login page?',
+                'description' => 'If checked footer will be displayed on login page',
+                'method' => 'checkbox',
+                'default' => 'on',
+        ),
+        'plugin_footer_logo' => array(
+                'friendly_name' => ('Company logo'),
+                'description' => __('You can add Company logo to the footer'),
+                'method' => 'file'
+                ),
+        'plugin_footer_content' => array(
                 'friendly_name' => 'Footer content, max 4000 chars',
-                'description' => 'Alowed tags - b, i, br',
-                'method' => 'textbox',
-                'default' => 'You can change <b> footer </b> in:<br/> console -> settings -> visual<br/><br/>',
-                'max_length' => '4000',
-                'size' => '100'
+                'description' => 'Alowed tags - a, b, i, br',
+                'method' => 'textarea',
+                'textarea_rows' => '5',
+                'textarea_cols' => '45',
+                'max_length' => 4000,
+                'default' => 'You can change <b> default footer </b> in:<br/><br/> console -> settings -> visual<br/><br/>'
         )
     );
 
@@ -70,13 +86,45 @@ function footer_config_settings()    {
     }
 }
 
+
+function footer_global_settings_update()	{
+
+
+        if (isset_request_var('plugin_footer_content')) {
+                $content = substr(strip_tags(get_nfilter_request_var('plugin_footer_content'),'<i><a><b><br>'),0,3999);
+                db_execute("UPDATE settings SET value='" . $content . "' where name='plugin_footer_content'");
+    	    unset_request_var('plugin_footer_content');                
+        }
+        
+}
+
 function footer_page_bottom()	{
 
-    if (read_config_option ('footer_enable') == 'on' )	{
-        cacti_log("Footer plugin displayed " . microtime()  ,true,"footer");
-	//print '<div>' . read_config_option ('footer_content',TRUE) . '</div>';
-	print  read_config_option ('footer_content',TRUE) ;
+    if (read_config_option ('plugin_footer_enable') == 'on' )	{
+        // cacti_log("Footer plugin displayed " . microtime()  ,true,"footer");
+	// exception for graph page, there is footer again
+	if (get_nfilter_request_var('action') != "tree_content")	{
+	    display_footer();
+	
+	}
+	 
+//	var_export(debug_backtrace(), false);
+
     }
+}
+
+
+function footer_login_after()	{
+    if (read_config_option ('plugin_footer_login_enable') == 'on' )	{
+	display_footer();
+    }
+}
+
+
+function display_footer()	{
+    print  read_config_option ('plugin_footer_content',TRUE) ;
+
+
 }
 
 ?>
