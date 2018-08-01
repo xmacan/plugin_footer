@@ -16,6 +16,8 @@ function plugin_footer_install ()	{
     api_plugin_register_hook('footer', 'login_after', 'footer_login_after', 'setup.php');
     api_plugin_register_hook('footer', 'global_settings_update', 'footer_global_settings_update', 'setup.php');
 
+// nologo
+    db_execute("insert into settings (name,value) values ('plugin_footer_logo','')");
 
 
 
@@ -88,14 +90,25 @@ function footer_config_settings()    {
 
 
 function footer_global_settings_update()	{
+    global $config;
+    
+    if (isset_request_var('plugin_footer_content')) {
+        $content = substr(strip_tags(get_nfilter_request_var('plugin_footer_content'),'<i><a><b><br>'),0,3999);
+        db_execute("UPDATE settings SET value='" . $content . "' where name='plugin_footer_content'");
+	unset_request_var('plugin_footer_content');                
+    }
+    // upload logo
+    
+    if (($_FILES['plugin_footer_logo']['tmp_name'] != 'none') && ($_FILES['plugin_footer_logo']['tmp_name'] != '') && $_FILES['plugin_footer_logo']['size'] < 250000) 	{
 
+	$extension = strtolower(pathinfo($_FILES['plugin_footer_logo']['tmp_name'],PATHINFO_EXTENSION));
+	$img = getimagesize($_FILES['plugin_footer_logo']['tmp_name']);
+	if ($img && $img[0] < 300 && $img[1] < 300 && ($extension == 'jpg' || $extension == 'png' || $extension == 'gif'))	{
+	    move_uploaded_file($_FILES['plugin_footer_logo']['tmp_name'], $config['base_path'] . '/plugins/footer/uploaded/logo.' . $extension);
+    	    db_execute("UPDATE settings SET value='logo." . $extension . "' where name='plugin_footer_logo'");
 
-        if (isset_request_var('plugin_footer_content')) {
-                $content = substr(strip_tags(get_nfilter_request_var('plugin_footer_content'),'<i><a><b><br>'),0,3999);
-                db_execute("UPDATE settings SET value='" . $content . "' where name='plugin_footer_content'");
-    	    unset_request_var('plugin_footer_content');                
-        }
-        
+	}
+    }    
 }
 
 function footer_page_bottom()	{
