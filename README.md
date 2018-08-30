@@ -8,7 +8,7 @@ Now supports only classic theme!
 Petr Macek (petr.macek@kostax.cz)
 
 ## Screenshot
-
+![screenshot_2018-08-30 console](https://user-images.githubusercontent.com/26485719/44874869-ced8f200-ac9c-11e8-9a6a-347178ef669f.png)
 
 ## Installation
 Copy directory footerto plugins directory
