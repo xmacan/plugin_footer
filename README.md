@@ -2,6 +2,7 @@
 
 ## Footer plugin
 Add and customize footer
+Now supports only classic theme!
 
 ## Author
 Petr Macek (petr.macek@kostax.cz)
