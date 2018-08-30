@@ -15,6 +15,10 @@ Check file permission (Linux/unix - readable for www server)
 Enable plugin (Console -> Plugin management)
 
 ## How to use?
+Configure footer text in console -> settings -> visual
+You can upload png image to /plugins/footer/uploaded/logo.png and it will be displayed automatically.
+Plugin hasn't upload functionality yet, you must upload it another way. 
+
     
 ## Upgrade    
 Copy and rewrite files
