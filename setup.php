@@ -17,7 +17,7 @@ function plugin_footer_install ()	{
     api_plugin_register_hook('footer', 'global_settings_update', 'footer_global_settings_update', 'setup.php');
 
 // nologo
-    db_execute("insert into settings (name,value) values ('plugin_footer_logo','')");
+//    db_execute("insert into settings (name,value) values ('plugin_footer_logo','')");
 
 
 
@@ -65,11 +65,13 @@ function footer_config_settings()    {
                 'method' => 'checkbox',
                 'default' => 'on',
         ),
+/*
         'plugin_footer_logo' => array(
                 'friendly_name' => ('Company logo'),
                 'description' => __('You can add Company logo to the footer'),
                 'method' => 'file'
                 ),
+*/
         'plugin_footer_content' => array(
                 'friendly_name' => 'Footer content, max 4000 chars',
                 'description' => 'Alowed tags - a, b, i, br',
@@ -77,7 +79,7 @@ function footer_config_settings()    {
                 'textarea_rows' => '5',
                 'textarea_cols' => '45',
                 'max_length' => 4000,
-                'default' => 'You can change <b> default footer </b> in:<br/><br/> console -> settings -> visual<br/><br/>'
+                'default' => '<b>Footer plugin</b><br/>You can change me in Console -> settings -> visual<br/><i>You can upload file <b>logo.png</b> to /plugin/footer/uploaded/<br/>and I will display it</i> :-)'
         )
     );
 
@@ -96,11 +98,13 @@ function footer_global_settings_update()	{
         $content = substr(strip_tags(get_nfilter_request_var('plugin_footer_content'),'<i><a><b><br>'),0,3999);
         db_execute("UPDATE settings SET value='" . $content . "' where name='plugin_footer_content'");
 	unset_request_var('plugin_footer_content');                
+	set_config_option ('plugin_footer_content',$content);
     }
+    
+/*    
     // upload logo
     
     if (($_FILES['plugin_footer_logo']['tmp_name'] != 'none') && ($_FILES['plugin_footer_logo']['tmp_name'] != '') && $_FILES['plugin_footer_logo']['size'] < 250000) 	{
-
 	$extension = strtolower(pathinfo($_FILES['plugin_footer_logo']['tmp_name'],PATHINFO_EXTENSION));
 	$img = getimagesize($_FILES['plugin_footer_logo']['tmp_name']);
 	if ($img && $img[0] < 300 && $img[1] < 300 && ($extension == 'jpg' || $extension == 'png' || $extension == 'gif'))	{
@@ -109,20 +113,17 @@ function footer_global_settings_update()	{
 
 	}
     }    
+*/
 }
 
 function footer_page_bottom()	{
 
     if (read_config_option ('plugin_footer_enable') == 'on' )	{
-        // cacti_log("Footer plugin displayed " . microtime()  ,true,"footer");
 	// exception for graph page, there is footer again
 	if (get_nfilter_request_var('action') != "tree_content")	{
 	    display_footer();
-	
 	}
-	 
 //	var_export(debug_backtrace(), false);
-
     }
 }
 
@@ -135,8 +136,16 @@ function footer_login_after()	{
 
 
 function display_footer()	{
-    print  read_config_option ('plugin_footer_content',TRUE) ;
+    global $config;
 
+    if (file_exists($config['base_path'] . '/plugins/footer/uploaded/logo.png'))	{
+	$img = getimagesize($config['base_path'] . '/plugins/footer/uploaded/logo.png');
+	if ($img && $img[0] < 300 && $img[1] < 300 && $img['mime'] == 'image/png')	{
+	    echo "<img src='" . $config['url_path'] . "plugins/footer/uploaded/logo.png' align='left' style='margin: 0px 10px' />";
+	}
+    }
+    print  read_config_option ('plugin_footer_content');
+    
 
 }
 
