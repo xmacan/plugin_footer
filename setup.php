@@ -138,10 +138,16 @@ function footer_login_after()	{
 function display_footer()	{
     global $config;
 
+    $selectedTheme = get_selected_theme();
+    echo "<link type='text/css' href='" . $config['url_path'] . "plugins/footer/themes/common.css' rel='stylesheet'>";
+    echo "<link type='text/css' href='" . $config['url_path'] . "plugins/footer/themes/" . $selectedTheme . ".css' rel='stylesheet'>";
+
+
+
     if (file_exists($config['base_path'] . '/plugins/footer/uploaded/logo.png'))	{
 	$img = getimagesize($config['base_path'] . '/plugins/footer/uploaded/logo.png');
 	if ($img && $img[0] < 300 && $img[1] < 300 && $img['mime'] == 'image/png')	{
-	    echo "<img src='" . $config['url_path'] . "plugins/footer/uploaded/logo.png' align='left' style='margin: 0px 10px' />";
+	    echo "<img src='" . $config['url_path'] . "plugins/footer/uploaded/logo.png' id='footer_logo' />";
 	}
     }
     print  read_config_option ('plugin_footer_content');
